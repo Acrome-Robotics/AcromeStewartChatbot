@@ -6,7 +6,7 @@ import { Source } from "../types";
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 export async function getChatbotResponse(question: string): Promise<{ text: string; sources: Source[] }> {
-  const model = "gemini-2.5-pro";
+  const model = "gemini-2.5-flash";
   const prompt = `
     You are an expert technical support chatbot for the ACROME Stewart Pro Platform.
     Your knowledge is based on the provided KNOWLEDGE BASE and supplemented by Google Search results.
