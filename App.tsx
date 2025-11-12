@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Message } from './types';
-import { getChatbotResponse } from './services/geminiService';
+import { getChatbotResponse } from './services/geminiService.ts';
 import ChatMessage from './components/ChatMessage';
 import { SendIcon, AcromeIcon, LoadingSpinner } from './components/Icons';
 
