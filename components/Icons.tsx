@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export const UserIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -57,3 +56,15 @@ export const LoadingSpinner: React.FC<{ className?: string }> = ({ className }) 
     ></path>
   </svg>
 );
+
+export const MicrophoneIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+    >
+      <path d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3z" />
+      <path d="M19 10v2a7 7 0 01-14 0v-2H3v2a9 9 0 008 8.94V22h-2v2h6v-2h-2v-1.06A9 9 0 0021 12v-2h-2z" />
+    </svg>
+  );
