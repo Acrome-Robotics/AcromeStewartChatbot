@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Message } from './types';
-import { getChatbotResponse } from './services/geminiService.ts';
+import { getChatbotResponse } from './services/geminiService';
 import ChatMessage from './components/ChatMessage';
 import { SendIcon, AcromeIcon, LoadingSpinner, MicrophoneIcon } from './components/Icons';
 
@@ -32,7 +32,7 @@ function App() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'initial',
-      text: "Hello! I am the ACROME Stewart Pro Platform assistant. How can I help you today?",
+      text: "Hello! I am yours ACROME assistant. How can I help you?",
       sender: 'ai',
     },
   ]);
