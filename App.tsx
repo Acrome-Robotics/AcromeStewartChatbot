@@ -38,15 +38,23 @@ function App() {
     setError(null);
 
     try {
-      const aiResponseText = await getChatbotResponse(userInput);
+      const { text: aiResponseText, sources } = await getChatbotResponse(userInput);
       const newAiMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: aiResponseText,
         sender: 'ai',
+        sources: sources,
       };
       setMessages((prevMessages) => [...prevMessages, newAiMessage]);
     } catch (err) {
-      setError('Failed to get response from AI. Please try again.');
+      const errorMessage = 'Failed to get response from AI. Please try again.';
+      setError(errorMessage);
+      const errorAiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: errorMessage,
+        sender: 'ai',
+      };
+      setMessages((prevMessages) => [...prevMessages, errorAiMessage]);
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -80,7 +88,9 @@ function App() {
               </div>
             </div>
           )}
-          {error && <div className="text-red-400 text-center">{error}</div>}
+          {error && !isLoading && (
+             <div className="text-red-400 text-center p-2 bg-red-900/20 rounded-lg">{error}</div>
+          )}
           <div ref={chatEndRef} />
         </div>
       </main>
@@ -99,6 +109,7 @@ function App() {
             type="submit"
             disabled={isLoading || !userInput.trim()}
             className="p-3 bg-blue-600 rounded-xl hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none flex items-center justify-center w-12 h-12"
+            aria-label="Send message"
           >
             {isLoading ? <LoadingSpinner className="w-6 h-6"/> : <SendIcon className="w-6 h-6" />}
           </button>
