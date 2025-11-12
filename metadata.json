@@ -1,0 +1,7 @@
+{
+  "name": "Acrome Stewart Platform AI Assistant",
+  "description": "An intelligent chatbot to help users troubleshoot and operate the ACROME Stewart Pro Platform, providing instant answers based on the official documentation.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
