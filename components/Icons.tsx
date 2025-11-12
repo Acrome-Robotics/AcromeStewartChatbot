@@ -16,9 +16,13 @@ export const UserIcon: React.FC<{ className?: string }> = ({ className }) => (
 );
 
 export const AcromeIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="currentColor" className={className}>
-      <circle cx="100" cy="100" r="80" fill="#D92D20" />
-      <path d="M100 40 L140 120 L60 120 Z" fill="white" stroke="white" strokeWidth="5" />
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 24 24" 
+      fill="currentColor" 
+      className={className}
+    >
+      <path d="M12 2.25c.91 0 1.63.58 1.9 1.39l.2 1.01h2.38c1.33 0 2.33.82 2.65 1.95l.13.52c.26 1.05.03 2.18-.62 3.02l-.52.68c-.8.95-1.09 2.18-.79 3.39l.13.52c.32 1.13-.68 2.27-2.01 2.27h-2.38l-.2 1.01c-.27.81-1 1.39-1.9 1.39s-1.63-.58-1.9-1.39l-.2-1.01H7.02c-1.33 0-2.33-.82-2.65-1.95l-.13-.52c-.26-1.05-.03-2.18.62-3.02l.52-.68c.8-.95 1.09-2.18.79-3.39l-.13-.52C5.7 6.47 6.7 5.33 8.03 5.33h2.38l.2-1.01c.27-.81 1-1.39 1.9-1.39z" />
     </svg>
 );
 
