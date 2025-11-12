@@ -6,7 +6,7 @@ import { Source } from "../types";
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 export async function getChatbotResponse(question: string): Promise<{ text: string; sources: Source[] }> {
-  const model = "gemini-2.5-flash";
+  const model = "gemini-2.5-pro";
   const prompt = `
     You are an expert technical support chatbot for the ACROME Stewart Pro Platform.
     Your knowledge is based on the provided KNOWLEDGE BASE and supplemented by Google Search results.
@@ -44,13 +44,14 @@ export async function getChatbotResponse(question: string): Promise<{ text: stri
         .map(web => ({ uri: web.uri, title: web.title || web.uri }));
 
     // Deduplicate sources by URI
-    const uniqueSources = Array.from(new Map(sources.map(s => [s.uri, s])).values());
+    // FIX: Add explicit type annotation to resolve TypeScript inference error.
+    const uniqueSources: Source[] = Array.from(new Map(sources.map(s => [s.uri, s])).values());
 
     return { text, sources: uniqueSources };
   } catch (error) {
     console.error("Error calling Gemini API:", error);
     return {
-        text: "Sorry, I encountered an error while trying to get a response. Please check the console for details.",
+        text: "Sorry, something went wrong. If the problem persists, please reach out to us at support@acrome.net.",
         sources: []
     };
   }
