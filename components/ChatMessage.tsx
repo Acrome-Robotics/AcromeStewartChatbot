@@ -5,9 +5,10 @@ import { UserIcon, AcromeIcon } from './Icons';
 
 interface ChatMessageProps {
   message: Message;
+  onSuggestionClick?: (suggestion: string) => void;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ message, onSuggestionClick }) => {
   const isUser = message.sender === 'user';
 
   const formatText = (text: string) => {
@@ -59,6 +60,22 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                         </li>
                     ))}
                 </ul>
+            </div>
+        )}
+        {message.suggestions && message.suggestions.length > 0 && onSuggestionClick && (
+            <div className="mt-4 pt-3 border-t border-gray-600/70">
+                <h4 className="text-xs font-semibold uppercase text-gray-400 mb-2 tracking-wider">Related Questions</h4>
+                <div className="flex flex-col items-start gap-2">
+                    {message.suggestions.map((suggestion, index) => (
+                        <button
+                            key={index}
+                            onClick={() => onSuggestionClick(suggestion)}
+                            className="text-left text-blue-300 hover:text-blue-200 hover:underline bg-gray-600/50 px-3 py-2 rounded-lg transition-colors w-full"
+                        >
+                            {suggestion}
+                        </button>
+                    ))}
+                </div>
             </div>
         )}
       </div>

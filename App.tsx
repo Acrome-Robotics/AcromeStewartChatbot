@@ -1,8 +1,10 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Message } from './types';
 import { getChatbotResponse } from './services/geminiService';
 import ChatMessage from './components/ChatMessage';
 import { SendIcon, AcromeIcon, LoadingSpinner, MicrophoneIcon } from './components/Icons';
+import TypingIndicator from './components/TypingIndicator';
 
 // Define the SpeechRecognition interface for TypeScript
 interface SpeechRecognition extends EventTarget {
@@ -29,19 +31,46 @@ declare global {
 }
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'initial',
-      text: "Hello! I am yours ACROME assistant. How can I help you?",
-      sender: 'ai',
-    },
-  ]);
+    // Load messages from localStorage on initial render
+    const [messages, setMessages] = useState<Message[]>(() => {
+        try {
+          const storedMessages = localStorage.getItem('acrome-chat-history');
+          if (storedMessages) {
+            const parsedMessages = JSON.parse(storedMessages);
+            // Ensure the stored data is a non-empty array before using it
+            if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
+              return parsedMessages;
+            }
+          }
+        } catch (error) {
+          console.error("Failed to parse chat history from localStorage", error);
+          // If parsing fails, it's safer to clear the corrupted data.
+          localStorage.removeItem('acrome-chat-history');
+        }
+        // Return the default initial message if nothing is stored or if storage is empty/corrupted.
+        return [{
+          id: 'initial',
+          text: "Hello! I am your ACROME assistant. How can I help you?",
+          sender: 'ai',
+        }];
+      });
+
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('acrome-chat-history', JSON.stringify(messages));
+    } catch (error) {
+      console.error("Failed to save chat history to localStorage", error);
+    }
+  }, [messages]);
+
 
   // Setup Speech Recognition API
   useEffect(() => {
@@ -84,32 +113,27 @@ function App() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!userInput.trim() || isLoading) return;
-
-    if (isRecording) {
-      recognitionRef.current?.stop();
-    }
+  const sendMessageAndGetResponse = async (messageText: string) => {
+    if (isLoading) return;
 
     const newUserMessage: Message = {
       id: Date.now().toString(),
-      text: userInput,
+      text: messageText,
       sender: 'user',
     };
 
     setMessages((prevMessages) => [...prevMessages, newUserMessage]);
-    setUserInput('');
     setIsLoading(true);
     setError(null);
 
     try {
-      const { text: aiResponseText, sources } = await getChatbotResponse(userInput);
+      const { text: aiResponseText, sources, suggestions } = await getChatbotResponse(messageText);
       const newAiMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: aiResponseText,
         sender: 'ai',
         sources: sources,
+        suggestions: suggestions,
       };
       setMessages((prevMessages) => [...prevMessages, newAiMessage]);
     } catch (err) {
@@ -125,6 +149,24 @@ function App() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userInput.trim() || isLoading) return;
+
+    if (isRecording) {
+      recognitionRef.current?.stop();
+    }
+
+    const messageToSend = userInput;
+    setUserInput('');
+    await sendMessageAndGetResponse(messageToSend);
+  };
+
+  const handleSuggestionClick = async (suggestion: string) => {
+    if (isLoading) return;
+    await sendMessageAndGetResponse(suggestion);
   };
 
   const handleToggleRecording = () => {
@@ -144,7 +186,7 @@ function App() {
       <header className="bg-gray-800 shadow-md p-4 flex items-center gap-4 border-b border-gray-700">
         <AcromeIcon className="w-10 h-10"/>
         <div>
-            <h1 className="text-xl font-bold text-gray-100">Stewart Pro AI Assistant</h1>
+            <h1 className="text-xl font-bold text-gray-100">Acrome Stewart Pro AI Assistant</h1>
             <p className="text-sm text-gray-400">Your guide to the Stewart Platform</p>
         </div>
       </header>
@@ -152,20 +194,13 @@ function App() {
       <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
         <div className="max-w-4xl mx-auto space-y-6">
           {messages.map((msg) => (
-            <ChatMessage key={msg.id} message={msg} />
+            <ChatMessage 
+                key={msg.id} 
+                message={msg} 
+                onSuggestionClick={handleSuggestionClick}
+            />
           ))}
-          {isLoading && (
-            <div className="flex items-start gap-4 justify-start">
-               <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
-                  <AcromeIcon className="w-8 h-8 text-white" />
-                </div>
-              <div className="max-w-xl p-4 rounded-2xl bg-gray-700 text-gray-200 rounded-bl-none flex items-center space-x-2">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-75"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-300"></div>
-              </div>
-            </div>
-          )}
+          {isLoading && <TypingIndicator />}
           {error && !isLoading && (
              <div className="text-red-400 text-center p-2 bg-red-900/20 rounded-lg">{error}</div>
           )}

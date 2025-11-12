@@ -9,4 +9,5 @@ export interface Message {
   text: string;
   sender: 'user' | 'ai';
   sources?: Source[];
+  suggestions?: string[];
 }
